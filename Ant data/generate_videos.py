@@ -108,8 +108,6 @@ if __name__=="__main__":
     csv_folder="LINK/TO/data"
     output_file="LINK/TO/OUTPUT"
 
-
-
     csv_files = glob.glob(
         os.path.join(csv_folder, "*.csv")
     )
