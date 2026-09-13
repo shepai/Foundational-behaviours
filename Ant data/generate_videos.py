@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
 from ant_env_grid import * 
+import os
+import glob
 
 #given trajectory
 #open up the grid
@@ -58,7 +60,7 @@ def get_stream(trajectory,videofilename):
     video.release()
 
 
-def get_numpy(trajectory,filename):
+def get_numpy(trajectory,filename=""):
     #create video
     first_frame = env.getObservation()
     # Convert to NumPy array if necessary
@@ -97,4 +99,88 @@ def get_numpy(trajectory,filename):
         array.append(view_at_point)
         #save to video stream
     #close video
-    np.save(filename,np.array(array).astype(np.uint8))
+    if filename!="":
+        np.save(filename,np.array(array).astype(np.uint8))
+    else:
+        return np.array(array).astype(np.uint8)
+
+if __name__=="__main__":
+    csv_folder="LINK/TO/data"
+    output_file="LINK/TO/OUTPUT"
+
+
+
+    csv_files = glob.glob(
+        os.path.join(csv_folder, "*.csv")
+    )
+
+    print(f"Found {len(csv_files)} CSV files")
+
+    videos = []
+
+    for i, csv_file in enumerate(csv_files):
+
+        print(
+            f"Processing {i + 1}/{len(csv_files)}: "
+            f"{os.path.basename(csv_file)}"
+        )
+
+        try:
+            # Load CSV
+            df = pd.read_csv(csv_file)
+
+            # Check required columns
+            if "rel_x" not in df.columns or "rel_y" not in df.columns:
+                print(
+                    f"Skipping {csv_file}: "
+                    "missing rel_x or rel_y"
+                )
+                continue
+
+            # Extract trajectory
+            trajectory = df[["rel_x", "rel_y"]].to_numpy(
+                dtype=np.float32
+            )
+
+            # Remove rows containing NaN values
+            trajectory = trajectory[
+                ~np.isnan(trajectory).any(axis=1)
+            ]
+
+            # Need at least two points
+            if len(trajectory) < 2:
+                print(
+                    f"Skipping {csv_file}: "
+                    "trajectory too short"
+                )
+                continue
+
+            # Convert trajectory into numpy video
+            video = get_numpy(trajectory)
+
+            # Store it
+            videos.append(video)
+
+        except Exception as e:
+            print(
+                f"Error processing {csv_file}: {e}"
+            )
+
+    # --------------------------------------------------------
+    # Make an object array because videos may have different
+    # dimensions / numbers of frames
+    # --------------------------------------------------------
+
+    videos = np.array(videos, dtype=object)
+
+    # Save dataset
+    np.save(
+        output_file,
+        videos,
+        allow_pickle=True
+    )
+
+    print()
+    print(f"Saved {len(videos)} videos to:")
+    print(output_file)
+
