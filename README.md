@@ -1,5 +1,5 @@
-# Foundational-behaviours-Physarum
-Looking at how Physarum solves problems as a foundational layer to AI
+# Foundational-behaviours
+Looking at how small brains solve problems as a foundational layer to AI
 
 ## Datasets
 
