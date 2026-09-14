@@ -7,7 +7,7 @@ import time
 import pandas as pd 
 
 class environment:
-    def __init__(self,data="/data/full_arena_grid_infer_views/",show=0,record=0,filename="output.avi",randomize_start=False):
+    def __init__(self,data="/home/dexter/Documents/data/29109845/",show=0,record=0,filename="output.avi",randomize_start=False):
         #form the correct datapaths
         self.filename=filename
         script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -19,7 +19,7 @@ class environment:
         self.y=self.grid["y_m"]
         self.files={}
         for f in self.grid['img_name']:
-            self.files[f]=cv2.resize(cv2.cvtColor(cv2.imread(self.datapath+'/'+f).astype(np.uint8), cv2.COLOR_BGR2GRAY), (8, 48), interpolation = cv2.INTER_AREA).T
+            self.files[f]=cv2.resize(cv2.cvtColor(cv2.imread(self.datapath+'/full_arena_grid_infer_views/'+f).astype(np.uint8), cv2.COLOR_BGR2GRAY), (8, 48), interpolation = cv2.INTER_AREA).T
         self.show=show
         self.record=record
         self.recording=0
